@@ -1,0 +1,2 @@
+../module-basic/basic-labelmaster.pl mapci.list > mapci.bas
+../run mapci

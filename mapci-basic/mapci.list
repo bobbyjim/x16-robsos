@@ -1,0 +1,38 @@
+
+
+longvar \bar
+longvar \trk.clli
+longvar \trk.dtc
+longvar \trk.channel
+longvar \trk.state
+longvar \trk.alarm
+longvar \trk.sev
+
+\bar$ = "\x93  cc      cmc     iod     "
+\bar$ = \bar$ + "net     pm      ccs     "
+\bar$ = \bar$ + "lns     trks    ext     "
+\bar$ = \bar$ + "appl"
+
+t%=42
+
+dim \trk.clli$(t%), \trk.dtc(t%), \trk.channel(t%)
+dim \trk.state(t%), \trk.alarm(t%), \trk.sev(t%)
+
+for x=0 to t%
+   read \trk.clli$(x), \trk.dtc(x), \trk.channel(x)
+   read \trk.state(x), \trk.alarm(x), \trk.sev(x)
+next
+
+
+rem emulate terminal
+VLOAD "PETFONT.BIN",8,1,0
+POKE $9F36,128
+color 15,0 :rem ltgrey on black
+
+rem ------------------------------------------------
+rem
+rem   main loop
+rem
+rem ------------------------------------------------
+{:template}
+? \bar$

@@ -1,0 +1,329 @@
+
+rem emulate terminal
+VLOAD "PETFONT.BIN",8,1,0
+POKE $9F36,128
+color 5,0 :rem green on black
+? chr$(147)
+
+longvar \msg
+longvar \repeat
+longvar \state
+longvar \warning
+longvar \confirm
+longvar \lv
+longvar \s00dimage
+
+\msg$ = ">95/11/03 10:03 "
+\msg$ = \msg$ + "*** SSR07BC Intl Sus Supv - NO MODULE REPLACING!!! ***"
+\state$ = "ci"
+
+dim \lv$(11)
+dim \s00dimage$(19)
+
+for x=0 to 11
+   read \lv$(x)
+next
+
+data "Volumes found on the node CM:
+data "-----------------------------
+data "
+data "NAME       TYPE      TOTAL       FREE TOTAL  OPEN  ITOC    LARGEST
+data "                    BLOCKS     BLOCKS FILES FILES FILES  FREE SEGMENT
+data "--------------------------------------------------------------------
+data "S00DIMAGE   STD    1433439     252850    10     0     6     252850
+data "S00DPMLOAD  STD     614239     475784   125     0     0     393087
+data "S01DIMAGE   STD    1433439     252850    10     0     6     252850
+data "S01DPMLOAD  STD     614239     368727   444     0     0     295724
+data "
+data "Total number of volumes found on node CM : 4
+
+for x=0 to 19
+   read \s00dimage$(x)
+next
+
+data "File information for volume S00DIMAGE:
+data "(NOTE:  1 BLOCK = 512 BYTES )
+data "--------------------------------------------------------------------
+data "FILE NAME            O R I O O V FILE   MAX    NUM OF    FILE   LAST
+data "                     R E T P L L CODE   REC   RECORDS    SIZE MODIFY
+data "                     G C O E D D        LEN        IN      IN   DATE
+data "                         C N                     FILE  BLOCKS
+data "--------------------------------------------------------------------
+data "PURE.SS7.DTC0.MS     I F            0  1020      6697   13394 951128
+data "PURE.SS7.DTC0.CM     I F            0  1020     65556  131112 951128
+data "IDDD.GWY02.300       I F Y          0  1020     58210  116420 960126
+data "300.250B.NEW.MS      I F Y          0  1020      6762   13524 951205
+data "SSR06.ALL.MS         I F Y          0  1020      6697   13394 951115
+data "FF.LISTAB.MS         I F            0  1020      6697   13394 960125
+data "GWY02AF.CM           I F            0  1020     57170  114340 960125
+data "FF.LISTAB.CM         I F            0  1020     66271  132542 960125
+data "FF.M05.011796.MS     I F            0  1020      6762   13524 960117
+data "FF.M03.100495.MS     I F            0  1020      6567   13134 951004
+data "FF.M03.100495.CM     I F            0  1020     63411  126822 951004
+data "FF.M05.011796.CM     I F            0  1020     66141  132282 960117
+
+gosub {:login}
+rem -------------------------------------
+rem
+rem   main loop
+rem
+rem -------------------------------------
+{:main loop}
+   gosub {:prompt}
+
+   i$ = ""
+   input i$
+
+   if i$ = "diskut" then \state$ = i$ 
+   if i$ = "diskut" then ? "disk utility is now active."
+   
+   if left$(i$,7) = "restart" then gosub {:restart}
+
+   if \state$ = "diskut" then gosub {:diskut}
+
+   goto {:main loop}
+
+rem -------------------------------------
+rem
+rem   restart
+rem
+rem -------------------------------------
+{:restart}
+
+\warning$ = "this will result in a call processing outage"
+gosub {:confirm}
+
+if \confirm = 0 then return
+
+if right$(i$,6) = "reload" then zz$ = "reloading switch."
+if right$(i$,4) = "cold"   then zz$ = "cold booting switch."
+if right$(i$,4) = "warm"   then zz$ = "warm booting switch."
+
+? ">"
+
+gosub {:wait}
+gosub {:wait}
+
+?:?
+? "dms released connection.
+? "press any key to continue..."
+{:get loop} get a$ :if a$="" goto {:get loop}
+
+end
+
+rem -------------------------------------
+rem
+rem   confirm
+rem
+rem -------------------------------------
+{:confirm}
+? \warning$
+? "please confirm ('yes', 'y', 'no', 'n'):"
+
+input ">"; r$
+\confirm = 0
+if left$(r$,1) = "y" then \confirm = 1
+
+return
+
+rem -------------------------------------
+rem
+rem   diskut
+rem
+rem -------------------------------------
+{:diskut}
+
+if left$(i$,2) = "lv" then gosub {:list volumes}
+
+if i$ = "lf s00dimage" then gosub {:lf s00dimage}
+if i$ = "listfl s00dimage" then gosub {:lf s00dimage}
+
+if left$(i$,6) = "cbf s0" then gosub {:cbf s00d}
+if left$(i$,6) = "clearbootfl s0" then gosub {:cbf s00d}
+
+if left$(i$,6) = "sbf s0" then gosub {:sbf s00dimage}
+if left$(i$,6) = "ssetbootfl s0" then gosub {:sbf s00dimage}
+
+return
+
+rem -------------------------------------
+rem
+rem   lv 0
+rem
+rem -------------------------------------
+{:list volumes}
+
+?:?
+? \lv$(0)
+? \lv$(1)
+for x = 3 to 11
+   ? \lv$(x)
+   gosub {:short wait}
+next
+?:?
+
+return
+
+rem -------------------------------------
+rem
+rem   lf s00dimage
+rem
+rem -------------------------------------
+{:lf s00dimage}
+
+?:?
+for x = 0 to 19
+   ? \s00dimage$(x)
+   gosub {:short wait}
+next
+?:?
+
+return
+
+rem -------------------------------------
+rem
+rem   cbf s00d
+rem
+rem -------------------------------------
+{:cbf s00d}
+
+if mid$(i$,9,1) = " " then {:cbf continue}
+?
+? "volume s00dimageimage either unavailable or does not exist on node cm."
+?
+return
+
+{:cbf continue}
+if right$(i$,3) = "all" then {:cbf continue 2}
+?
+? "undefined command (" i$ ")"
+?
+return
+
+{:cbf continue 2}
+
+gosub {:confirm}
+if \confirm = 0 then return
+
+la$ = mid$(i$,10,2) :rem cm or ms
+
+rem the itoc field is at column 26
+rem if column 49 is a space, it's an ms load!!
+
+for x = 8 to 19
+   lb$ = "cm"
+   if mid$(\s00dimage$(x),49,1) = " " then lb$ = "ms"
+   if la$ <> lb$ goto {:skip clear}
+   \s00dimage$(x) = left$(\s00dimage$(x),25) + " " + mid$(\s00dimage$(x),27)
+{:skip clear}
+next
+
+?
+? "the whole image table of contents for " la$
+? " on s00dimage has been cleared.
+?
+
+return
+
+
+rem -------------------------------------
+rem
+rem   sbf s00dimage bootfile ms|cm 1
+rem
+rem -------------------------------------
+rem the itoc field is at column 26
+{:sbf s00dimage}
+
+la$ = left$(right$(i$,4),2) :rem cm or ms
+ok = 0
+
+for x = 8 to 19
+   rem find the filename length
+   fl = 20
+   for n = 8 to 18
+      if fl < n goto {:found it}
+      if mid$(\s00dimage$(x),n,1) = " " then fl = n
+{:found it}
+   next n
+
+   rem now compare with i$ starting at c15
+   rem ? ":" mid$(i$,15,fl), left$(\s00dimage$(x),fl)
+   if mid$(i$,15,fl) <> left$(\s00dimage$(x),fl) goto {:skip}
+   
+   rem found it
+   \s00dimage$(x) = left$(\s00dimage$(x),25) + "y" + mid$(\s00dimage$(x),27)
+   ?
+   ? "file " left$(\s00dimage$(x),fl) " in volume s00dimage has been"
+   ? "registered in the image table of contents for " la$
+   ? "as entry number 1."
+   ?
+   ok = 1
+{:skip}
+next
+
+
+
+return
+
+rem -------------------------------------
+rem
+rem   prompt
+rem
+rem -------------------------------------
+{:prompt}
+\repeat = 1 - \repeat
+if \repeat = 0 goto {:short prompt}
+? \msg$ 
+? \state$ ":"
+
+{:short prompt}
+? ">";
+return
+
+rem -------------------------------------
+rem
+rem   login
+rem
+rem -------------------------------------
+{:login}
+gosub {:wait}
+? "initializing cmap"
+?:? "attempting to connect to '.map-x25.250b.bnrrich-dms'
+
+gosub {:wait}
+?:? "connected to 'hc1.map-x25.250b.bnrrich-dms'
+?:? "  via gateway 47.166.64.77 and link crchh898_0
+?:? "  as device T019336
+?:?:?
+
+gosub {:wait}
+?:? "enter username and password
+?:? "or   log on automatically by pressing return
+
+input a$
+
+z = rnd(-ti)
+c$ = "cmap" + mid$(str$(int(rnd(1)*20)),2)
+? "trying " c$
+
+gosub {:wait}
+? "break key is ^b (control-b). type 'help' for assistance\x11\x11"
+
+return
+
+
+rem ---------------------------------------------
+rem
+rem   wait (latency inducer for versimilitude)
+rem
+rem ---------------------------------------------
+{:wait}
+t=ti+int(rnd(1)*250)
+{:until} if ti < t goto {:until}
+return
+
+{:short wait}
+t=ti+int(rnd(1)*25)
+{:short until} if ti < t goto {:short until}
+return
+

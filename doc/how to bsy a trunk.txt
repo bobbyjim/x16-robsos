@@ -1,0 +1,69 @@
+mapci;mtc;trks;ttp;c7ttp
+
+post d dtc X Y
+
+I've found that I can post a specific DS0, or conversely I can post a specific DTC port and use 12/Next to move thru all 24 DS0's, but is there a way to post all 24 DS0's on my screen?
+
+---
+
+If you want to BSY or RTS an entire T-1, the post it by the port, i.e.
+
+post d dtc 5 4
+
+then type BSY ALL, BSY INB ALL or RTS ALL and it will apply to DS0s on DTC 5 X 4.
+
+If you post it via the CLLI
+
+post g <trunk clli>
+
+and use BSY ALL, BSY INB ALL or RTS ALL, it applies to all members of the trunk group (the DSOs can be on different T-1s.
+
+---
+
+>h loadpm
+LOADPM: Load the whole PM, or a unit
+        ALL parameter will execute LOADPM on
+        all PMs in the post set of the same PM
+        type as the PM displayed on the MAP
+Parms: <DEVICE> {UNIT <UNIT_NO> {0 TO 1},
+                 PM,
+                 INACTIVE}
+       [<SOURCE> {CC [<MODE> {FULL,
+                              DATA,
+                              EXEC,
+                              CMR}]
+                     [<FILE> STRING],
+                  LOCAL [<MODE> {IMAGE,
+                                 LOADFILE}]
+                        [<FILE> STRING]}]
+       [<FORCE> {FORCE}]
+       [<NOWAIT> {NOWAIT}]
+       [<ALL> {ALL [<RFILE> STRING]}]
+
+
+
+>h tst
+TST: Test the whole PM, a unit, a PSIDE link or
+     a CMR card.                              
+     ALL parameter will execute TST on
+     all PMs in the post set of the same PM
+     type as the PM displayed on the MAP.
+     REX ON/OFF will enable/disable system REX,
+     REX QUERY will display REX history,
+     REX NOW will initiate immediate REX on the
+     posted PM.
+     The PM can have from 1 to 64 pside links
+     depending on the given PM architecture.
+Parms: <DEVICE> {UNIT <UNIT_NO> {0 TO 1}
+                      [<ROM> {ROM}]
+                      [<CMR> {CMR}]
+                      [<ALL> {ALL}],
+                 PM [<ROM> {ROM}]
+                    [<CMR> {CMR}]
+                    [<ALL> {ALL}],
+                 LINK <PSIDE_LINK> {0 TO 63},
+                 REX <REX_ACTION> {ON,
+                                   OFF,
+                                   QUERY,
+                                   NOW [<NOWAIT> {NOWAIT}]}}
+
