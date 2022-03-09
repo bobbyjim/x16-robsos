@@ -5,6 +5,7 @@
 
 #include "volumes.h"
 #include "ci.h"
+#include "pause.h"
 
 VolumeStringHeaders* stringHeaders;
 Volume* volume;
@@ -26,20 +27,24 @@ int volumes_list()
 
     stringHeaders = ((VolumeStringHeaders*)(0xa000));
     volume = ((Volume*)(0xa400));
-   
+
+    pause();
     puts("\nVolumes found on the node CM:\n"
          "\n-----------------------------\n");
+    pause();
+    printf("\n%s\n", stringHeaders->title1_1);
+    pause();
+    printf("\n%s\n", stringHeaders->title1_2);
+    pause();
+    printf("\n%s\n", stringHeaders->title1_3);
 
-    printf("%s\n\n%s\n\n%s\n",
-        stringHeaders->title1_1,
-        stringHeaders->title1_2,
-        stringHeaders->title1_3
-    );
     j=0;
     for(i=0; i<7; ++i)
     {           
         unsigned long totalBlocks = (volume[i].hdr.totalBlocks << 8) * 100L + 614239;
-     
+
+        pause();
+
         if (volume[i].hdr.volumeName[0] == 0)
            break;
 
@@ -87,24 +92,32 @@ void volumes_find(char *vol)
        return;
     }
 
+    pause();
     printf("\nFile information for volume %s:\n", vol);
-    printf("\n%s\n\n%s\n\n%s\n\n%s\n\n%s\n\n%s\n\n%s\n\n",
-        stringHeaders->title2_1,
-        stringHeaders->title2_2,
-        stringHeaders->title2_3,
-        stringHeaders->title2_4,
-        stringHeaders->title2_5,
-        stringHeaders->title2_6,
-        stringHeaders->title2_7);
+    pause();
+    printf("\n%s\n", stringHeaders->title2_1);
+    pause();
+    printf("\n%s\n", stringHeaders->title2_2);
+    pause();
+    printf("\n%s\n", stringHeaders->title2_3);
+    pause();
+    printf("\n%s\n", stringHeaders->title2_4);
+    pause();
+    printf("\n%s\n", stringHeaders->title2_5);
+    pause();
+    printf("\n%s\n", stringHeaders->title2_6);
+    pause();
+    printf("\n%s\n", stringHeaders->title2_7);
+    pause();
     
     for(j=0; j<volume[chosen].hdr.totalFiles; ++j)
     {
         entry = volume[chosen].entry[j];
         maxRecordLength = (entry.maxRecLen << 8) - 4;
         if (maxRecordLength < 0) maxRecordLength = 1;
-        //maxRecordLength = maxRecordLength * maxRecordLength;
-
-          printf("\n%-31s %c %c %c %c %c %c %4d %5d %9lu %7lu %lu\n",
+ 
+        pause();
+        printf("\n%-31s %c %c %c %c %c %c %4d %5d %9lu %7lu %lu\n",
             entry.fileName,
             org[ (int)entry.org ],
             rec[ (int)entry.rec ],
