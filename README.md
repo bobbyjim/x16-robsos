@@ -11,12 +11,12 @@ practice C coding.  It helps that the X16 has a browser-based emulator.
 
 Commands implemented:
 
-diskut
-lv 0
-lf|listfl <{volume}IMAGE>
-sbf|setbootfl
-cbf|clearbootfl
+     diskut
+     lv 0
+     lf|listfl <{volume}IMAGE>
+     sbf|setbootfl
+     cbf|clearbootfl
 
-
-I'll add in SBF and CBF, then add RESTART and a few fun extras.
-Then I hope to add a subset of TTP.
+# Plans
+I hope to add a subset of TTP functionality, where you can post, bsy, offline,
+and rts trunks.
