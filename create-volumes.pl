@@ -102,12 +102,13 @@ foreach (@volume)
         # print "- file size in blocks: $fileSizeInBlocks\n";
         # print "- last modified: $lastModifyDate\n\n";
 
-        $filename =~ s/\x5f/\xa4/g; # underscore to PETSCII underscore
-        $filename = lc $filename;
-
         $org = 0 unless $org;
-        $org = 1 if $org eq 'I';
-        $ord = 2 if $ord eq 'O';
+        $org = 1 if $filename =~ /_CM$/; # $org eq 'I' 
+        $org = 2 if $filename =~ /_MS$/;
+        $org = 3 if $org eq 'O';
+
+        $filename =~ s/\x5f/\xa4/g; # underscore to PETSCII underscore
+        #$filename = lc $filename;
 
         $rec = 0 unless $rec;
         $rec = 4 if $rec eq 'F';
@@ -140,7 +141,7 @@ __DATA__
 S00DIMAGE             STD    1433439     599839    10     0     6     252850
 PURE_SS7_DTC0_MS                I.F            0  1020      6697   13394 951128
 PURE_SS7_DTC0_CM                I.F            0  1020     65556  131112 951128
-IDDD_GWY02_300                  I.F.Y          0  1020     58210  116420 960126
+IDDD_GWY02_300_CM               I.F.Y          0  1020     58210  116420 960126
 300_250B_NEW_MS                 I.F.Y          0  1020      6762   13524 951205
 SSR06_ALL_MS                    I.F.Y          0  1020      6697   13394 951115
 300_250B_NEW_CM                 I.F            0  1020     60095  120190 951205
@@ -214,4 +215,3 @@ SPM4239KS                       O.F            0  2044      1476    2952 911124
 DTCI372334                      O.F            0  2044      1476    2952 981025
 XPM181                          O.F            0  2044       573    1146 960822
 DTC6626LGB                      O.F            0   508      1387    2774 970622
-

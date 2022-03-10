@@ -57,7 +57,7 @@ void toDefaultColor()
    cbm_k_bsout(GREEN); 
 }
 
-void loadFile(char* name, byte bankNum)
+void common_loadFile(char* name, byte bankNum)
 {  
    cbm_k_setnam(name);
    cbm_k_setlfs(IGNORE_LFN,EMULATOR_FILE_SYSTEM,SA_IGNORE_HEADER);
@@ -65,7 +65,7 @@ void loadFile(char* name, byte bankNum)
    cbm_k_load(LOAD_FLAG, 0xa000);
 }
 
-void loadFileAtB800(char* name, byte bankNum)
+void common_loadFileAtB800(char* name, byte bankNum)
 {
    cbm_k_setnam(name);
    cbm_k_setlfs(IGNORE_LFN,EMULATOR_FILE_SYSTEM,SA_IGNORE_HEADER);

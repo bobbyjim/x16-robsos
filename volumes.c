@@ -7,11 +7,12 @@
 #include "ci.h"
 #include "pause.h"
 
-VolumeStringHeaders* stringHeaders;
-Volume* volume;
+VolumeStringHeaders*    stringHeaders;
+VolumeEntry*            targetentry;
+Volume*                 volume;
 int i, j;
 
-char org[]  = { 'O', 'I', 'O', ' ' };
+char org[]  = { 'O', 'I', 'I', 'O' };
 char rec[]  = { ' ', 'F', 'V', ' ' };
 char itoc[] = { ' ', 'Y' };
 char open[] = { ' ', 'Y' };
@@ -21,10 +22,47 @@ char vld[]  = { ' ', 'Y' };
 char tmpname[20];
 char tmptype[4];
 
+Volume* volumes_find(char *vol)
+{
+    int chosen = -1;
+
+    setBank(2);
+    stringHeaders = ((VolumeStringHeaders*)(0xa000));
+    volume = ((Volume*)(0xa400));
+
+    for(i=0; i<7; ++i)
+        if (!strcmp(vol, volume[i].hdr.volumeName) )
+           chosen = i;
+
+    if (chosen == -1)
+       return 0;
+
+    return &(volume[chosen]);
+}
+
+VolumeEntry* volumes_findEntry(char *volName, char *bootfile)
+{
+    volume = volumes_find( volName );
+    if (!volume)
+    {
+        //printf( "Volume %s either unavailable or does not exist on node CM.\n", volName);
+        return 0;
+    }
+
+    for(j=0; j<volume->hdr.totalFiles; ++j)
+    {
+        targetentry = &(volume->entry[j]);
+        if (!strcmp(targetentry->fileName, bootfile))
+           return targetentry;
+    }
+
+    //printf( "Volume %s either unavailable or does not exist on node CM.\n", bootfile);
+    return 0;
+}
+
 int volumes_list()
 {
     setBank(2);
-
     stringHeaders = ((VolumeStringHeaders*)(0xa000));
     volume = ((Volume*)(0xa400));
 
@@ -68,15 +106,13 @@ int volumes_list()
     return j;
 }
 
-void volumes_find(char *vol)
+void volumes_listfiles(char *vol)
 {
     VolumeEntry entry;
-    int k;
     int maxRecordLength;
     int chosen = -1;
 
     setBank(2);
-
     stringHeaders = ((VolumeStringHeaders*)(0xa000));
     volume = ((Volume*)(0xa400));
 
@@ -113,12 +149,13 @@ void volumes_find(char *vol)
     for(j=0; j<volume[chosen].hdr.totalFiles; ++j)
     {
         entry = volume[chosen].entry[j];
+        ci_inputToUpper(entry.fileName, tmpname);
         maxRecordLength = (entry.maxRecLen << 8) - 4;
         if (maxRecordLength < 0) maxRecordLength = 1;
  
         pause();
         printf("\n%-31s %c %c %c %c %c %c %4d %5d %9lu %7lu %lu\n",
-            entry.fileName,
+            tmpname,
             org[ (int)entry.org ],
             rec[ (int)entry.rec ],
             itoc[ (int)entry.itoc ],
@@ -132,7 +169,4 @@ void volumes_find(char *vol)
             entry.lastModifyDate
         );  
     }
-    //
-    //
-    //
 }

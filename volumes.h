@@ -45,13 +45,17 @@ typedef struct {
           byte filler1;
           unsigned long numOfRecordsInFile; 
           byte filler2;
-          int  org       :2; // "I" "O"
+
+          int  org       :2; // 0 = no org.  1 = CM ("I").  2 = MS ("I").  3 = Other ("O")
           int  rec       :2; // "F" "V"
           int  itoc      :1; // empty or "Y"
           int  open      :1; // empty or "Y"
           int  old       :1; // empty or "Y"
           int  vld       :1; // empty or "Y"
-          byte filler3;
+
+          int  bootnum   :4;
+          int  filler3   :4;
+          
           byte  maxRecLen;
           byte filler4;
           byte filler5;
@@ -63,6 +67,8 @@ typedef struct {
 } Volume;
 
 int volumes_list();
-void volumes_find(char *vol);
+void volumes_listfiles(char *vol);
+Volume* volumes_find(char *vol);
+VolumeEntry* volumes_findEntry(char *volName, char *bootfile);
 
 #endif

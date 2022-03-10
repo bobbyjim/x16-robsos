@@ -14,21 +14,27 @@
 
 byte cycle = 1;
 byte state = STATE_CI;
-char* entry_message[] = {
+char* state_entry_message[] = {
     "",
     "Disk utility is now active.",
     "Current MODE setting is: EXTENDED\n",
-    "",
-    "",
-    ""
+    "traver",
+    "restart",
+    "mapci",
+    "mtc",
+    "trk",
+    "ttp"
 };
 
 char* prompt[] = {
     "CI",
     "DISKUT",
     "LOGUTIL",
+    "TRAVER",
+    "RESTART",
     "MAPCI",
     "MTC",
+    "TRK",
     "TTP"
 };
 
@@ -37,27 +43,62 @@ byte quitState[] = {
     STATE_CI,
     STATE_CI,
     STATE_CI,
+    STATE_CI,
+    STATE_CI,
     STATE_MAPCI,
-    STATE_MTC
+    STATE_MTC,
+    STATE_TRK
 };
 
-char banner[60] = "*** SSR07BC Intl Sus Supv - NO MODULE REPLACING!!! ***";
+char* state_help[] = {
+    "\n   DISKUT\n"
+    "\n   QUIT\n"
+    "\n   QUIT ALL\n"
+    "\n   SETLOGMSG <message text>\n",
+
+    "\n   CBF|CLEARBOOTFL  <volume>  <CM|MS> ALL\n"
+    "\n   LF|LISTFL  <(volume)IMAGE>\n"
+    "\n   LV <0|1>\n"
+    "\n   SBF|SETBOOTFL <(volume>IMAGE> <bootfile> <NN> 1\n",
+
+    "\n   no help for logutil\n",
+    "\n   no help for mapci\n",
+    "\n   no help for mtc\n",
+    "\n   no help for trk\n",
+    "\n   no help for ttp\n"
+};
+
+char banner[80] = "*** SSR07BC Intl Sus Supv - NO MODULE REPLACING!!! ***";
 
 char ciInputBuffer[80];
 char ciLowerBuffer[80];
 int i1, i2;
-char c1[20], c2[20];
+char c1[80], c2[20], c3[20];
+
+int ci_confirm(char* msg)
+{
+    puts(msg);
+    printf("\nPlease confirm (\"YES\", \"Y\", \"NO\", or \"N\"):\n\n>");
+    ci_readLine();
+
+    if (!strcmp(ciLowerBuffer, "y") || !strcmp(ciLowerBuffer, "yes"))
+        return 1;
+
+    return 0;
+}
 
 char* ci_toUpper(char* s)
 {
+    char* tmp = s;
     while(*s) *s = toupper(*s++);
-    return s;
+    return tmp;
 }
 
 char* ci_toLower(char* s)
 {
+    char* tmp = s;
     while(*s) *s = tolower(*s++);
-    return s;
+    return tmp;
 }
 
 char* ci_inputToLower(char* in, char* out)
@@ -74,7 +115,7 @@ char* ci_inputToUpper(char* in, char* out)
     return out;
 }
 
-void login()
+void ci_login()
 {
     pause();    
     puts("\nInitializing cmap\n");
@@ -121,8 +162,8 @@ void ci_setState(byte st)
 {
     state = st;
     cycle = 1; // reset
-    if (entry_message[st][0] > 0)
-        printf("\n%s\n", entry_message[st]);
+    if (strlen(state_entry_message[st]) > 0)
+        printf("\n%s\n", state_entry_message[st]);
 }
 
 void ci_run()
@@ -150,9 +191,19 @@ void ci_run()
     }
 
 //    printf("[%s]\n", ciLowerBuffer);
+    if EQ( "help",    ciLowerBuffer ) puts(state_help[state]);
     if EQ( "quit",    ciLowerBuffer ) ci_setState(quitState[state]);
+    if EQ( "quit all",ciLowerBuffer ) ci_setState(STATE_CI);
     if EQ( "diskut",  ciLowerBuffer ) ci_setState(STATE_DISKUT);
-    if EQ( "logutil", ciLowerBuffer ) ci_setState(STATE_LOGUTIL);
+//    if EQ( "logutil", ciLowerBuffer ) ci_setState(STATE_LOGUTIL);
+//    if EQ( "msg",     ciLowerBuffer ) ci_sendMsg();
+//    if EQ( "restart", ciLowerBuffer ) ci_setState(STATE_RESTART);
+//    if EQ( "traver",  ciLowerBuffer ) ci_setState(STATE_TRAVER);
+    if (1 == sscanf( ciLowerBuffer, "setlogmsg %s", c1))
+        strcpy(banner, &ciLowerBuffer[10]);
+    // if ((1 == sscanf( ciLowerBuffer, "query %s", c1))
+    //  || (1 == sscanf( ciLowerBuffer, "query module %s", c1)))
+    //     ci_module_query(c1);
 
     ci_prompt();
 }

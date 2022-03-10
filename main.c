@@ -20,28 +20,11 @@
 
 */
 
-#include <cbm.h>
-#include <peekpoke.h>
 #include <conio.h>
-#include <unistd.h>
-#include <string.h>
-#include <stdio.h>
-
 
 #include "common.h"
 #include "trk.h"
-#include "ckt.h"
-#include "ttp.h"
 #include "ci.h"
-#include "volumes.h"
-
-
-#define  PROMPT               cprintf("\r%u %c", _heapmemavail(), '>')
-
-void init()
-{
-   trk_initTrunks(); 
-}
 
 void main() 
 {
@@ -49,15 +32,15 @@ void main()
    textcolor(COLOR_GRAY3);
    clrscr();
 
-   loadFile("trkmem.bin", 1);
-   loadFile("volumes.bin", 2);
+   common_loadFile("trkmem.bin", 1);
+   common_loadFile("volumes.bin", 2);
   
    cbm_k_setnam("pet-case.bin");
    cbm_k_setlfs(0,8,0);
    cbm_k_load(2, 0x0f800);
 
-   init();
-   login();
+   trk_initTrunks();
+   ci_login();
 
    for(;;)
    {

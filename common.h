@@ -52,8 +52,8 @@ void setBank(byte bank);
 
 void hr(byte color);
 void toDefaultColor();
-void loadFile(char* name, byte bankNum);
-void loadFileAtB800(char* name, byte bankNum);
+void common_loadFile(char* name, byte bankNum);
+void common_loadFileAtB800(char* name, byte bankNum);
 void down(byte count);
 void left(byte count);
 char pressReturnAndClear();

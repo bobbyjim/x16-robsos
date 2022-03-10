@@ -11,10 +11,10 @@ void pause_jiffies(unsigned jiffies)
 
 void pause()
 {
-   pause_jiffies( rand() % 25 );
+   // pause_jiffies( rand() % 25 );
 }
 
 void pause_long()
 {
-   pause_jiffies( rand() % 250 );
+   // pause_jiffies( rand() % 250 );
 }
