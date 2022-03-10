@@ -13,7 +13,10 @@ Commands implemented:
 
 diskut
 lv 0
-lf <{volume}IMAGE>
+lf|listfl <{volume}IMAGE>
+sbf|setbootfl
+cbf|clearbootfl
+
 
 I'll add in SBF and CBF, then add RESTART and a few fun extras.
 Then I hope to add a subset of TTP.
