@@ -1,5 +1,22 @@
+/*
+    ROBSOS
 
-#include <conio.h>
+    Copyright (C) 2022 Robert Eaglestone
+
+    This file is part of ROBSOS
+
+    ROBSOS is free software: you can redistribute it and/or modify
+    it under the terms of the MIT License.
+
+    ROBSOS is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    MIT License for more details.
+
+    You should have received a copy of the MIT License along with ROBSOS.  
+    If not, see <https://mit-license.org/>.
+*/
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -127,7 +144,8 @@ void ci_login()
     pause_long();
     puts("\n\nEnter username and password\n");
     puts("OR   log on automatically by pressing RETURN\n");
-    i1 = cgetc();
+    fgets(ciLowerBuffer, sizeof(ciLowerBuffer), stdin);
+    ciLowerBuffer[0] = 0; // wipe out
     _randomize();
 
     printf("Trying cmap%02d\n\n", 1 + rand() % 20);
@@ -182,6 +200,9 @@ void ci_run()
         case STATE_MTC:
             break;
 
+        case STATE_TRK:
+            break;
+
         case STATE_TTP:
             break;
 
@@ -189,10 +210,15 @@ void ci_run()
             break;
     }
 
-    if EQ( "help",    ciLowerBuffer ) puts(state_help[state]);
+    if EQ( "", ciLowerBuffer ) {}
+    ELIFEQ( "help",    ciLowerBuffer ) puts(state_help[state]);
     ELIFEQ( "quit",    ciLowerBuffer ) ci_setState(quitState[state]);
     ELIFEQ( "quit all",ciLowerBuffer ) ci_setState(STATE_CI);
     ELIFEQ( "diskut",  ciLowerBuffer ) ci_setState(STATE_DISKUT);
+    ELIFEQ( "mapci",   ciLowerBuffer ) ci_setState(STATE_MAPCI);
+    ELIFEQ( "mtc",     ciLowerBuffer ) ci_setState(STATE_MTC);
+    ELIFEQ( "trk",     ciLowerBuffer ) ci_setState(STATE_TRK);
+    ELIFEQ( "ttp",     ciLowerBuffer ) ci_setState(STATE_TTP);
     else if ( !strncmp( "restart", ciLowerBuffer, 7) ) 
     {
         restart_run();
