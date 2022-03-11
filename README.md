@@ -15,11 +15,12 @@ Commands implemented:
      quit
      quit all
      setlogmsg
+     restart warm|cold|reload
      diskut
-     lv 0
-     lf|listfl <{volume}IMAGE>
-     sbf|setbootfl
-     cbf|clearbootfl
+        lv 0
+        lf|listfl <{volume}IMAGE>
+        sbf|setbootfl
+        cbf|clearbootfl
 
 "help" is not an actual DMS SOS command.  I added it because I forget 
 command syntax.

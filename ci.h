@@ -3,6 +3,11 @@
 
 #include "common.h"
 
+
+#define     EQ(s1,s2)       (!strcmp(s1,s2))
+#define     ELIFEQ(s1,s2)   else if (!strcmp(s1,s2))
+
+
 #define  STATE_CI             0
 #define  STATE_DISKUT         1
 #define  STATE_LOGUTIL        2

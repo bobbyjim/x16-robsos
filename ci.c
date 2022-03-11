@@ -9,8 +9,7 @@
 #include "pause.h"
 #include "common.h"
 #include "diskut.h"
-
-#define     EQ(s1,s2)       (!strcmp(s1,s2))
+#include "restart.h"
 
 byte cycle = 1;
 byte state = STATE_CI;
@@ -190,20 +189,22 @@ void ci_run()
             break;
     }
 
-//    printf("[%s]\n", ciLowerBuffer);
     if EQ( "help",    ciLowerBuffer ) puts(state_help[state]);
-    if EQ( "quit",    ciLowerBuffer ) ci_setState(quitState[state]);
-    if EQ( "quit all",ciLowerBuffer ) ci_setState(STATE_CI);
-    if EQ( "diskut",  ciLowerBuffer ) ci_setState(STATE_DISKUT);
-//    if EQ( "logutil", ciLowerBuffer ) ci_setState(STATE_LOGUTIL);
-//    if EQ( "msg",     ciLowerBuffer ) ci_sendMsg();
-//    if EQ( "restart", ciLowerBuffer ) ci_setState(STATE_RESTART);
-//    if EQ( "traver",  ciLowerBuffer ) ci_setState(STATE_TRAVER);
-    if (1 == sscanf( ciLowerBuffer, "setlogmsg %s", c1))
+    ELIFEQ( "quit",    ciLowerBuffer ) ci_setState(quitState[state]);
+    ELIFEQ( "quit all",ciLowerBuffer ) ci_setState(STATE_CI);
+    ELIFEQ( "diskut",  ciLowerBuffer ) ci_setState(STATE_DISKUT);
+    else if ( !strncmp( "restart", ciLowerBuffer, 7) ) 
+    {
+        restart_run();
+    }
+    else if (1 == sscanf( ciLowerBuffer, "setlogmsg %s", c1))
+    {
         strcpy(banner, &ciLowerBuffer[10]);
-    // if ((1 == sscanf( ciLowerBuffer, "query %s", c1))
-    //  || (1 == sscanf( ciLowerBuffer, "query module %s", c1)))
-    //     ci_module_query(c1);
+    }
+    else
+    {
+        printf( "\nUndefined Command \"%s\"\n", ci_toUpper(ciInputBuffer));
+    }
 
     ci_prompt();
 }
