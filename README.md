@@ -11,11 +11,18 @@ practice C coding.  It helps that the X16 has a browser-based emulator.
 
 Commands implemented:
 
+     help 
+     quit
+     quit all
+     setlogmsg
      diskut
      lv 0
      lf|listfl <{volume}IMAGE>
      sbf|setbootfl
      cbf|clearbootfl
+
+"help" is not an actual DMS SOS command.  I added it because I forget 
+command syntax.
 
 # Plans
 I hope to add a subset of TTP functionality, where you can post, bsy, offline,

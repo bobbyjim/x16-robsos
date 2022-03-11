@@ -1,4 +1,5 @@
-
+use strict;
+use autodie;
 
 open my $out, '>', 'VOLUMES.BIN';
 print $out '..';  # two throwaway bytes.
@@ -26,46 +27,7 @@ print $out pack 'x285';  # rest of 1k
 #  Each Volume is 1K in size, and consists of one HEADER, and thirty-one ENTRIES.
 #
 #     The HEADER is a 32-byte structure.
-#     All char arrays are ASCII-Z and the final character must be null.
-#     The data is little-endian encoded.
-#   
-#          char volumeName[16];
-#          char volumeType[4];
-#          byte totalBlocks;            <-- shifted, scaled, translated
-#          unsigned long freeBlocks;         
-#          unsigned long largestFreeSegment; 
-#
-#          int totalFiles : 5 bits;
-#          int openFiles  : 5 bits;
-#          int padding1   : 6 bits;
-#
-#          int itocFiles  : 4 bits;
-#          int junk       : 4 bits;
-#          byte junk1;
-#          byte junk2;
-#   
-#          = 32 bytes.
-#   
-#     Next comes 31 ENTRIES, which have this structure:
-#   
-#          char fileName[17];           // 16 + null
-#          char lastModifyDate[7];      // 6 + null
-#          unsigned long numOfRecordsInFile; 
-#   
-#          int  org       :2; // "I" "O"
-#          int  rec       :2; // "F" "V"
-#          int  itoc      :1; // empty or "Y"
-#          int  open      :1; // empty or "Y"
-#          int  old       :1; // empty or "Y"
-#          int  vld       :1; // empty or "Y"
-#
-#          int  maxRecLen :3; // 2^(n+6)
-#          int  padding   :5;
-#
-#          byte filler1;
-#          byte filler2;
-#   
-#          = 32 bytes
+#     Next comes 31 ENTRIES, each in a 32 byte structure.
 
 $/ = /\n\n/;  # split on empty line
 my @volume = <DATA>;
@@ -108,6 +70,7 @@ foreach (@volume)
         $org = 3 if $org eq 'O';
 
         $filename =~ s/\x5f/\xa4/g; # underscore to PETSCII underscore
+        $filename =~ s/\s*$//;      # trim
         #$filename = lc $filename;
 
         $rec = 0 unless $rec;
@@ -119,19 +82,26 @@ foreach (@volume)
 
         $flags = $org + $rec + $itoc;
 
-        $maxRecordLength = ($maxRecordLength + 4) >> 8;
-        $maxRecordlength = 0 if $maxRecordLength < 0;
-        #print "$maxRecordLength\n";
+        if ($maxRecordLength > 0)
+        {
+           $maxRecordLength += 4;
+           $maxRecordLength = int($maxRecordLength/64);
+#           print "max record length: $maxRecordLength\n";
+        }
 
-        print $out pack 'Z17', $filename;
-        print $out pack 'V',   $lastModifyDate;
-        print $out '-';
-        print $out pack 'V',   $numOfRecordsInFile;
-        print $out '-';
+        my $bootnum = $itoc? 1 : 0;
+
+        $lastModifyDate    -= 930000 if $filename;
+        #print STDERR "last modified date: $lastModifyDate\n";
+
+        $numOfRecordsInFile = int($numOfRecordsInFile/2);
+
+        print $out pack 'Z25', $filename;
+        print $out pack 'v',   $lastModifyDate;
+        print $out pack 'v',   $numOfRecordsInFile; # 2 bytes!
         print $out pack 'C',   $flags;
-        print $out '-';
+        print $out pack 'C',   $bootnum;
         print $out pack 'C',   $maxRecordLength;
-        print $out '--';
     }
 }
 
@@ -151,11 +121,11 @@ FF_M06_012496_CM                I.F            0  1020     66141  132282 960124
 SSR07BC_CM                      I.F            0  1020     67432  134864 951015
 
 S00DPMLOAD            STD     614239     578713    19     0     0     558676
-XPM04160                        O.F            0  2044       585    1170 900706
+XPM04160                        O.F            0  2044       585    1170 930706
 DTCI0673075K                    O.F            0  8188       631    1262 950407
-DTC565FKK                       O.F            0  4092       512    1024 920319
+DTC565FKK                       O.F            0  4092       512    1024 930319
 SPMHJD                          O.F            0  1020      1238    2476 990105
-DTC6224ZOL                      O.F            0  1020      1227    2454 920616
+DTC6224ZOL                      O.F            0  1020      1227    2454 930616
 SPM03061KZ                      O.F            0   508      1244    2488 980922
 DTC64662556XBQ                  O.F            0  8188      1001    2002 970118
 DTCI4517317I                    O.F            0  4092      1364    2728 971024
@@ -163,11 +133,11 @@ DTC401869316                    O.F            0  2044       926    1852 970812
 DTCI459501R                     O.F            0   508       795    1590 930610
 XPM516436032AX                  O.F            0   252       698    1396 940122
 XPM013044X                      O.F            0   252       843    1686 940801
-ZPMZI                           O.F            0  1020      1027    2054 920301
+ZPMZI                           O.F            0  1020      1027    2054 930301
 ZPM922017                       O.F            0   252      1217    2434 930330
 SPM57099528J                    O.F            0  2044       663    1326 990410
 DTC36196691VBD                  O.F            0  1020       994    1988 970921
-XPM822175687A                   O.F            0   252      1332    2664 921116
+XPM822175687A                   O.F            0   252      1332    2664 931116
 DTC40199LP                      O.F            0    64       844    1688 930522
 DTCI463571806X                  O.F            0  4092       622    1244 950811
 
@@ -177,7 +147,7 @@ FF_LISTAB_MS                    I.F.Y          0  1020      6697   13394 960125
 GWY02AF_CM                      I.F.Y          0  1020     57170  114340 960125
 FF_LISTAB_CM                    I.F.Y          0  1020     66271  132542 960125
 GWY02AE_CM                      I.F            0  1020     56274  112548 960108
-DONT_DEL_THESE                  O.V            0     1         1     255 950805
+DONT_DELETE_ANY_FF_LOADS        O.V            0     1         1     255 950805
 FF_M05_011796_MS                I.F            0  1020      6762   13524 960117
 FF_M03_100495_MS                I.F.Y          0  1020      6567   13134 951004
 FF_M03_100495_CM                I.F.Y          0  1020     63411  126822 951004
@@ -185,8 +155,8 @@ FF_M05_011796_CM                I.F            0  1020     66141  132282 960117
 
 S01DPMLOAD            STD     614239     603921     5     0     0     562901
 XPM68253MQ                      O.F            0  1020      1300    2600 960607
-DTCI86147WWA                    O.F            0   252       572    1144 900627
-SPM231895422J                   O.F            0  4092       663    1326 920614
+DTCI86147WWA                    O.F            0   252       572    1144 930627
+SPM231895422J                   O.F            0  4092       663    1326 930614
 DTCI41190070T                   O.F            0  1020      1236    2472 990307
 DTC41439NFJ                     O.F            0   128      1388    2776 990905
 
@@ -203,15 +173,15 @@ SPM59                           O.F            0  8188      1457    2914 950226
 ZPM4008                         O.F            0  2044      1364    2728 980516
 SPM7046                         O.F            0  4092      1276    2552 930329
 XPM925KHE                       O.F            0   508       614    1228 980009
-ZPM2CPE                         O.F            0  2044      1082    2164 920726
-ZPM112158BMX                    O.F            0   128       727    1454 911115
-DTCI663Z                        O.F            0  4092       969    1938 921125
+ZPM2CPE                         O.F            0  2044      1082    2164 930726
+ZPM112158BMX                    O.F            0   128       727    1454 931115
+DTCI663Z                        O.F            0  4092       969    1938 931125
 DTC59U                          O.F            0    64       824    1648 990606
 SPM916BRT                       O.F            0  2044      1226    2452 950423
 ZPM541438                       O.F            0  8188       921    1842 931026
 XPM998782YR                     O.F            0  4092       896    1792 960729
-DTC02390X                       O.F            0   508      1033    2066 900510
-SPM4239KS                       O.F            0  2044      1476    2952 911124
+DTC02390X                       O.F            0   508      1033    2066 930510
+SPM4239KS                       O.F            0  2044      1476    2952 931124
 DTCI372334                      O.F            0  2044      1476    2952 981025
 XPM181                          O.F            0  2044       573    1146 960822
 DTC6626LGB                      O.F            0   508      1387    2774 970622

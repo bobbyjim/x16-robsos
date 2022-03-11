@@ -35,6 +35,12 @@ void boot_sbf(char* volName, char* bootfile, int num)
 
 void boot_cbf(char* volName, char* node)
 {
+   int i;
+   int volumeType = VOLUME_TYPE_CM;
+
+   if (!strcmp("ms", node) || !strcmp("MS", node))
+      volumeType = VOLUME_TYPE_MS;
+
    strcat(volName, "image");
    vol = volumes_find(volName);
 
@@ -43,11 +49,9 @@ void boot_cbf(char* volName, char* node)
        if (! ci_confirm("\nThe ITOC will be emptied."))
           return;
 
-       for(i=0; i<7; ++i)
-       {           
-          if (volume[i].hdr.volumeName[0] > 0)
-             
-       }
+       for(i=0; i<vol->hdr.totalFiles; ++i)
+          if (vol->entry[i].org == volumeType)
+             vol->entry[i].itoc = 0;
 
        printf("The whole Image Table Of Contents for %s\n\n"
               "on %s has been cleared.\n\n",

@@ -109,7 +109,6 @@ int volumes_list()
 void volumes_listfiles(char *vol)
 {
     VolumeEntry entry;
-    int maxRecordLength;
     int chosen = -1;
 
     setBank(2);
@@ -150,11 +149,9 @@ void volumes_listfiles(char *vol)
     {
         entry = volume[chosen].entry[j];
         ci_inputToUpper(entry.fileName, tmpname);
-        maxRecordLength = (entry.maxRecLen << 8) - 4;
-        if (maxRecordLength < 0) maxRecordLength = 1;
  
         pause();
-        printf("\n%-31s %c %c %c %c %c %c %4d %5d %9lu %7lu %lu\n",
+        printf("\n%-31s %c %c %c %c %c %c    0  %4u %9lu %7lu %ld\n",
             tmpname,
             org[ (int)entry.org ],
             rec[ (int)entry.rec ],
@@ -162,11 +159,12 @@ void volumes_listfiles(char *vol)
             open[ (int)entry.open ],
             old[ (int)entry.old ],
             vld[ (int)entry.vld ],
-            0,
-            maxRecordLength,
-            entry.numOfRecordsInFile,
-            entry.numOfRecordsInFile * 2,
-            entry.lastModifyDate
+//                 0,
+            entry.maxRecLen * 64 - 4,
+            entry.numOfRecordsInFile * 2L,
+            entry.numOfRecordsInFile * 4L,
+            entry.lastModifyDate + 930000L
         );  
     }
+    puts("");
 }

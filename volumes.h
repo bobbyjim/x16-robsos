@@ -39,12 +39,15 @@ typedef struct {
 
 } VolumeHeader;
 
+#define     VOLUME_TYPE_NONE        0
+#define     VOLUME_TYPE_CM          1
+#define     VOLUME_TYPE_MS          2
+#define     VOLUME_TYPE_OTHER       3
+
 typedef struct {
-          char fileName[17];          
-          unsigned long lastModifyDate;     
-          byte filler1;
-          unsigned long numOfRecordsInFile; 
-          byte filler2;
+          char fileName[25];
+          unsigned int lastModifyDate;     
+          unsigned int numOfRecordsInFile; 
 
           int  org       :2; // 0 = no org.  1 = CM ("I").  2 = MS ("I").  3 = Other ("O")
           int  rec       :2; // "F" "V"
@@ -56,9 +59,8 @@ typedef struct {
           int  bootnum   :4;
           int  filler3   :4;
           
-          byte  maxRecLen;
-          byte filler4;
-          byte filler5;
+          byte maxRecLen;
+
 } VolumeEntry;
 
 typedef struct {
