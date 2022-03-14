@@ -27,6 +27,7 @@
 #include "common.h"
 #include "diskut.h"
 #include "restart.h"
+#include "ttp.h"
 
 byte cycle = 1;
 byte state = STATE_CI;
@@ -50,7 +51,7 @@ char* prompt[] = {
     "RESTART",
     "MAPCI",
     "MTC",
-    "TRK",
+    "TRKS",
     "TTP"
 };
 
@@ -68,8 +69,10 @@ byte quitState[] = {
 
 char* state_help[] = {
     "\n   DISKUT\n"
+    "\n   MAPCI\n"
     "\n   QUIT\n"
     "\n   QUIT ALL\n"
+    "\n   RESTART RELOAD|COLD|WARM\n"
     "\n   SETLOGMSG <message text>\n",
 
     "\n   CBF|CLEARBOOTFL  <volume>  <CM|MS> ALL\n"
@@ -106,7 +109,12 @@ int ci_confirm(char* msg)
 char* ci_toUpper(char* s)
 {
     char* tmp = s;
-    while(*s) *s = toupper(*s++);
+    while(*s) 
+    {
+       if ( *s != toupper(*s) )
+           *s = toupper(*s) - 96; // 96 to adjust for the PETSCII case file
+       *s++;
+    }
     return tmp;
 }
 
@@ -134,16 +142,16 @@ char* ci_inputToUpper(char* in, char* out)
 void ci_login()
 {
     pause();    
-    puts("\nInitializing cmap\n");
-    puts("Attemping to connect to '.map-x25.250b.bnrrich-dms'\n");
+    puts("\nInitializing cmap\n"
+         "Attemping to connect to '.map-x25.250b.bnrrich-dms'\n");
     pause_long();
-    puts("Connected to 'hc1.map-x25.250b.bnrrich-dms'\n");
-    puts("  via gateway 47.166.64.77 and link crchh898-0\n");
-    puts("  as device T019336\n");
+    puts("Connected to 'hc1.map-x25.250b.bnrrich-dms'\n"
+         "  via gateway 47.166.64.77 and link crchh898-0\n"
+         "  as device T019336\n");
 
     pause_long();
-    puts("\n\nEnter username and password\n");
-    puts("OR   log on automatically by pressing RETURN\n");
+    puts("\n\nEnter username and password\n"
+         "OR   log on automatically by pressing RETURN\n");
     fgets(ciLowerBuffer, sizeof(ciLowerBuffer), stdin);
     ciLowerBuffer[0] = 0; // wipe out
     _randomize();
@@ -203,9 +211,6 @@ void ci_run()
         case STATE_TRK:
             break;
 
-        case STATE_TTP:
-            break;
-
         default:
             break;
     }
@@ -217,8 +222,9 @@ void ci_run()
     ELIFEQ( "diskut",  ciLowerBuffer ) ci_setState(STATE_DISKUT);
     ELIFEQ( "mapci",   ciLowerBuffer ) ci_setState(STATE_MAPCI);
     ELIFEQ( "mtc",     ciLowerBuffer ) ci_setState(STATE_MTC);
-    ELIFEQ( "trk",     ciLowerBuffer ) ci_setState(STATE_TRK);
-    ELIFEQ( "ttp",     ciLowerBuffer ) ci_setState(STATE_TTP);
+    ELIFEQ( "trks",    ciLowerBuffer ) ci_setState(STATE_TRK);
+    ELIFEQ( "ttp",     ciLowerBuffer ) ttp_run();
+    ELIFEQ( "mapci;mtc;trks;ttp", ciLowerBuffer ) ttp_run();
     else if ( !strncmp( "restart", ciLowerBuffer, 7) ) 
     {
         restart_run();

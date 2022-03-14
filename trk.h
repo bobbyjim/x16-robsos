@@ -72,6 +72,32 @@ typedef struct {
    int severity:   4;
 } Trunk;
 
+/*
+print $out pack 'A4x', $_ for @state;       # 3 bits,  40 bytes
+print $out pack 'A3x', $_ for @trunks;      # 3 bits,  32 bytes
+print $out pack 'A2x', $_ for @direction;   # 2 bits,  12 bytes
+print $out pack 'A2x' , $_ for @line;       # 1 bit,   12 bytes
+print $out pack 'A2x', $_ for @select;      # 2 bits,  12 bytes
+print $out pack 'A4x', $_ for @card;        # 2 bits,  20 bytes
+*/
+typedef struct {
+    //
+    //  Strings should take up 128 bytes
+    //
+    char state[8][5];
+    char trunkType[8][4];
+    char direction[4][3];
+    char line[2][3];
+    char select[4][3];
+    char card[4][5];
+
+    //
+    //  64 trunks at 32 bytes = 2048 bytes
+    //
+    Trunk trunk[64];
+} Trunkmem;
+
+
 void  trk_initTrunks();
 byte  trk_getTrunkAlarmCount();
 char* trk_getTrunkAlarmType();
@@ -79,5 +105,6 @@ char* trk_getTrunkSeverity();
 char* trk_getStatusLabel( byte trunk );
 byte  trk_getStatus( byte trunk );
 void trk_print(Trunk* trunk);
+Trunk* trk_findByClli(char* clli);
 
 #endif

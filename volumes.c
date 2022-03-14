@@ -43,7 +43,7 @@ Volume* volumes_find(char *vol)
 {
     int chosen = -1;
 
-    setBank(2);
+    setBank(BANK_VOLUMES);
     stringHeaders = ((VolumeStringHeaders*)(0xa000));
     volume = ((Volume*)(0xa400));
 
@@ -79,7 +79,7 @@ VolumeEntry* volumes_findEntry(char *volName, char *bootfile)
 
 int volumes_list()
 {
-    setBank(2);
+    setBank(BANK_VOLUMES);
     stringHeaders = ((VolumeStringHeaders*)(0xa000));
     volume = ((Volume*)(0xa400));
 
@@ -128,7 +128,7 @@ void volumes_listfiles(char *vol)
     VolumeEntry entry;
     int chosen = -1;
 
-    setBank(2);
+    setBank(BANK_VOLUMES);
     stringHeaders = ((VolumeStringHeaders*)(0xa000));
     volume = ((Volume*)(0xa400));
 

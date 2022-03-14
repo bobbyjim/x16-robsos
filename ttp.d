@@ -1,4 +1,4 @@
-.obj/ttp.o:	ttp.c ttp.h common.h ckt.h trk.h pause.h
+.obj/ttp.o:	ttp.c ci.h common.h ttp.h ckt.h trk.h pause.h
 
-ttp.c ttp.h common.h ckt.h trk.h pause.h:
+ttp.c ci.h common.h ttp.h ckt.h trk.h pause.h:
 

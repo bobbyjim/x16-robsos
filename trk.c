@@ -17,7 +17,11 @@
     If not, see <https://mit-license.org/>.
 */
 #include <conio.h>
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
 
+#include "ci.h"
 #include "trk.h"
 #include "common.h"
 
@@ -48,6 +52,23 @@ char* severity[4] = {
 	" *C*  "
 };
 
+Trunkmem* trkmem;
+
+Trunk* trk_findByClli(char* clli)
+{
+   int x;
+
+   ci_toUpper(clli);
+   setBank(BANK_TRUNKMEM);
+   for(x=0; x<TRKMEM_TRUNK_COUNT; ++x)
+   {
+      // only match the first six characters
+      if (!strncmp(TRKMEM_TRUNK_DATA(x)->clli, clli, 6))
+         return TRKMEM_TRUNK_DATA(x);
+   }
+   return 0;
+}
+
 char* trk_getStatusLabel( byte trunk )
 {
    return status[ TRKMEM_TRUNK_STATE(trunk) ];
@@ -58,26 +79,28 @@ byte trk_getStatus( byte trunk )
    return TRKMEM_TRUNK_STATE(trunk);
 }
 
-
 void trk_initTrunks()
 {
+   trkmem = (Trunkmem*)(0xa000); // mind the bank when you actually read this.
 }
 
 void trk_print(Trunk* trunk)
 {
-   cprintf("%12s  typ %d dir %d lin %d sel %d   sgp %2d ckt   %d st %d dtc %d mv %d   %2d %d",
+   setBank(BANK_TRUNKMEM);
+
+   cprintf("%12s  lin %d sel %d   sgp %2d ckt   %d st %d dtc %d",
          trunk->clli,
-         trunk->ttype,
-         trunk->direction,
+         //trunk->ttype,      // typ %d
+         //trunk->direction,  // dir %d
          trunk->line,
          trunk->select,
          trunk->sgroup,
          trunk->ckt,
          trunk->state,
-         trunk->dtc,
-         trunk->memvar1,
-         trunk->memvar2,
-         trunk->memvar3
+         trunk->dtc //,
+         //trunk->memvar1,   // %d
+         //trunk->memvar2,   // %d
+         //trunk->memvar3    // %d
    );
 }
 

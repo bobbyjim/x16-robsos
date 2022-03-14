@@ -21,10 +21,8 @@
 
 #include "common.h"
 
-
 #define     EQ(s1,s2)       (!strcmp(s1,s2))
 #define     ELIFEQ(s1,s2)   else if (!strcmp(s1,s2))
-
 
 #define  STATE_CI             0
 #define  STATE_DISKUT         1
@@ -40,6 +38,7 @@ void ci_login();
 void ci_run();
 void ci_prompt();
 int  ci_readLine();
+void ci_setState(byte st);
 
 char* ci_inputToLower(char* in, char* out);
 char* ci_inputToUpper(char* in, char* out);

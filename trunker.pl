@@ -38,9 +38,12 @@ for my $memvar (0..63)
    my $tdir = int(rand(@direction));   # 2 bits 
    my $tlin = int(rand(@line));        # 1 bit 
    my $tsel = int(rand(@select));      # 2 bits 
+   my $prefix = sprintf( "%d%d%d", int(rand(9)+1), int(rand(10)), int(rand(10)));
 
-   my $clli = $trunks[ $ttyp ]
-            . sprintf( "%d%d%d", int(rand(9)+1), int(rand(10)), int(rand(10)))
+   my $shortclli = $trunks[ $ttyp ]
+                 . $prefix;
+
+   my $clli = $shortclli
             . $direction[ $tdir ]
             . $line[ $tlin ]
             . $select[ $tsel ];

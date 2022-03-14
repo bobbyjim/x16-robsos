@@ -22,14 +22,20 @@
 #include "common.h"
 #include "ckt.h"
 
-void ttp_run(char *lineInputBuffer);
-int ttp_readLine(char *in);
+
+#define     MAIN_DISPLAY_TOP        8
+#define     MAIN_DISPLAY_BOTTOM     57
+
+
+void ttp_run();
+int ttp_readLine();
 
 void ttp_writeScreen();
 void ttp_post( char* clli );
-void ttp_post_number(int trunknum);
-void ttp_bsy(int trunknum);
-void ttp_rts(int trunknum);
+
+//void ttp_post_number(int trunknum);
+//void ttp_bsy(int trunknum);
+//void ttp_rts(int trunknum);
 
 void ttp_next( Circuit* circuit );
 void ttp_first( Circuit* circuit );

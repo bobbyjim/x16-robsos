@@ -21,6 +21,9 @@ Commands implemented:
         lf|listfl <{volume}IMAGE>
         sbf|setbootfl
         cbf|clearbootfl
+     mapci;mtc;trks;ttp
+        post <CLLI>
+        trunks (to get a list of trunks)
 
 "help" is not an actual DMS SOS command.  I added it because I forget 
 command syntax.

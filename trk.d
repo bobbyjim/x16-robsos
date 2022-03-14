@@ -1,4 +1,4 @@
-.obj/trk.o:	trk.c trk.h common.h
+.obj/trk.o:	trk.c ci.h common.h trk.h
 
-trk.c trk.h common.h:
+trk.c ci.h common.h trk.h:
 

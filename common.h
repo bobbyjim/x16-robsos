@@ -19,6 +19,10 @@
 #ifndef _common_h_
 #define _common_h_
 
+#define  BANK_TRUNKMEM           1
+#define  BANK_VOLUMES            2
+
+
 #define HORIZ_BAR       0xc0
 #define VERT_BAR        0xdd
 
