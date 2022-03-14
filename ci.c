@@ -143,22 +143,22 @@ void ci_login()
 {
     pause();    
     puts("\nInitializing cmap\n"
-         "Attemping to connect to '.map-x25.250b.bnrrich-dms'\n");
+         "\nAttemping to connect to '.map-x25.250b.bnrrich-dms'\n");
     pause_long();
     puts("Connected to 'hc1.map-x25.250b.bnrrich-dms'\n"
-         "  via gateway 47.166.64.77 and link crchh898-0\n"
-         "  as device T019336\n");
+         "\n  via gateway 47.166.64.77 and link crchh898-0\n"
+         "\n  as device T019336\n");
 
     pause_long();
     puts("\n\nEnter username and password\n"
-         "OR   log on automatically by pressing RETURN\n");
+         "\nOR   log on automatically by pressing RETURN\n");
     fgets(ciLowerBuffer, sizeof(ciLowerBuffer), stdin);
     ciLowerBuffer[0] = 0; // wipe out
     _randomize();
 
-    printf("Trying cmap%02d\n\n", 1 + rand() % 20);
+    printf("\nTrying cmap%02d\n\n", 1 + rand() % 20);
     pause_long();
-    puts("Break key is ^b (Control-b). Type 'help' for assistance\n");
+    puts("\nBreak key is ^b (Control-b). Type 'help' for assistance\n");
 }
 
 int ci_readLine()
@@ -191,12 +191,16 @@ void ci_setState(byte st)
         printf("\n%s\n", state_entry_message[st]);
 }
 
+byte bad_command;
+
 void ci_run()
 {
+    bad_command = 1;
     switch(state)
     {
         case STATE_DISKUT:
             diskut_run();
+            bad_command = 0;
             break;
         
         case STATE_LOGUTIL:
@@ -233,7 +237,7 @@ void ci_run()
     {
         strcpy(banner, &ciLowerBuffer[10]);
     }
-    else
+    else if (bad_command)
     {
         printf( "\nUndefined Command \"%s\"\n", ci_toUpper(ciInputBuffer));
     }

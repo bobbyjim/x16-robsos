@@ -229,7 +229,8 @@ void ttp_post(char* clli)
 
    if (!tmptrunk)
    {
-      printf("CLLI %s not found.", clli);
+      gotoxy(3,50);
+      printf("ERROR: CLLI %s not found.", clli);
       return;
    }
 
@@ -277,8 +278,8 @@ void ttp_post(char* clli)
    );
 
    slow_rewrite(13,16,67,"                                                r                  ");
+   
    slow_rewrite(13,28,67,""); 
-
    pause();
    gotoxy(13,28);
    cprintf("POST G %s", tmptrunk->clli);
@@ -289,6 +290,7 @@ void ttp_post(char* clli)
    gotoxy(13,32);
    cprintf("SHORT CLLI IS: %s", shortClli);
 
+   slow_rewrite(0,50,79,"");
    slow_rewrite(13,34,67,"OK,CKT POSTED         ");
 }
 
