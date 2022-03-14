@@ -36,3 +36,8 @@ void pause_long()
 {
    pause_jiffies( rand() % 250 );
 }
+
+void pause_short()
+{
+   pause_jiffies( (rand() % 5)  *  (rand() % 5));
+}

@@ -22,5 +22,6 @@
 void pause_jiffies(unsigned jiffies);
 void pause();
 void pause_long();
+void pause_short();
 
 #endif

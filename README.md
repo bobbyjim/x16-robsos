@@ -23,11 +23,24 @@ Commands implemented:
         cbf|clearbootfl
      mapci;mtc;trks;ttp
         post <CLLI>
+        bsy
+        rts
+        offl
         trunks (to get a list of trunks)
 
 "help" is not an actual DMS SOS command.  I added it because I forget 
 command syntax.
 
-# Plans
-I hope to add a subset of TTP functionality, where you can post, bsy, offline,
-and rts trunks.
+# Trunks
+The trunks are all completely randomly generated.  Don't expect them to make
+much sense at all.
+
+There are 64 trunks, randomly generated.  There are likely some very wrong
+strings in there.
+
+## Trunk Maintenance
+Minimal and buggy. You can offline, bsy, or rts a posted trunk.
+It won't let you rts an offl trunk -- bsy it first.  It won't tell you this.
+
+You can use the first 6 characters of a CLLI when posting a trunk; e.g.
+you can POST DAL360 instead of POST DAL360ICDTGS or whatever it is.

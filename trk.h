@@ -47,6 +47,9 @@
 #define     TRUNK_STATE_FUBAR    6
 #define     TRUNK_STATE_HCF      7
 
+#define     TRUNK_ERROR_NO_TRUNK_POSTED                 -1
+#define     TRUNK_ERROR_CANNOT_RTS_AN_OFFLINE_TRUNK     -2
+
 typedef struct {
    byte searchUID;
    char clli[13];       // include the null byte to align the structure

@@ -34,8 +34,9 @@ void ttp_writeScreen();
 void ttp_post( char* clli );
 
 //void ttp_post_number(int trunknum);
-//void ttp_bsy(int trunknum);
-//void ttp_rts(int trunknum);
+int ttp_bsy();
+int ttp_rts();
+int ttp_offl();
 
 void ttp_next( Circuit* circuit );
 void ttp_first( Circuit* circuit );

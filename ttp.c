@@ -45,6 +45,8 @@ extern char ciLowerBuffer[80];
 extern int i1, i2;
 extern char c1[80], c2[20], c3[20];
 
+char postedClli[16];
+Trunk* postedTrunk;
 
 void ttp_clear_center()
 {
@@ -87,23 +89,28 @@ void ttp_run()
       {
          ttp_list_trunks();
       }
-      else if (1 == sscanf(ciInputBuffer, "post %s", c1))
+      else if (1 == sscanf(ciInputBuffer, "post %s", postedClli))
       {
-         ttp_post(c1);
+         ttp_post(postedClli);
       }
-      else if (1 == sscanf(ciLowerBuffer, "post %d", &trunknum))
+/*      else if (1 == sscanf(ciLowerBuffer, "post %d", &trunknum))
       {
-         //ttp_post_number(trunknum);
-      }
+         ttp_post_number(trunknum);
+      }*/
       else if(!strcmp(ciLowerBuffer, "bsy"))
       {
-         //ttp_bsy(trunknum);
-         //ttp_post_number(trunknum);
+         ttp_bsy();
+         ttp_post(postedClli);
       }
       else if(!strcmp(ciLowerBuffer, "rts"))
       {
-         //ttp_rts(trunknum);
-         //ttp_post_number(trunknum);
+         ttp_rts();
+         ttp_post(postedClli);
+      }
+      else if(!strcmp(ciLowerBuffer, "offl"))
+      {
+         ttp_offl();
+         ttp_post(postedClli);
       }
    }
 }
@@ -142,7 +149,10 @@ void ttp_writeScreen()
    gotoxy(0,6);
    cputs("TTP         \r\n            \r\n");
    for(i=0; i<18; ++i)
+   {
       cprintf("   %-8s \r\n            \r\n", ttp_menu[i]);
+      pause_short();
+   }
    revers(0);
 
 // cputsxy(0,0,"   CC     CMC     IOD     Net     PM     CCS     Lns     Trks     Ext    APPL");
@@ -192,6 +202,15 @@ void ttp_writeScreen()
       
 // }
 
+void slow_rewrite(int x, int y, int len, char* line)
+{
+   pause_short();
+   gotoxy(x,y);
+   cclear(len);
+   gotoxy(x,y);
+   cputsxy(x,y,line);
+}
+
 void ttp_post(char* clli)
 {
    char* direction;
@@ -206,41 +225,42 @@ void ttp_post(char* clli)
 
    tmptrunk = trk_findByClli(clli);
 
-   ttp_clear_center();
+//   ttp_clear_center();
 
    if (!tmptrunk)
    {
-      printf("not found");
+      printf("CLLI %s not found.", clli);
       return;
    }
 
-   // ckt type  = .direction (2w), 
-   //      "      .ttype (s7), 
-   //      "      "card" (gwc) let's use .dtc for this
-   // pm no     = .dtc   (8)
-   // ????      =  ???   (5)
-   // com lang  = .clli
-   // sta       = .state
-   // last cktn = .ckt
+   postedTrunk = tmptrunk; // hang on to this for later.
 
    direction = trkmem->direction[ tmptrunk->direction ];
    ttype     = trkmem->trunkType[ tmptrunk->ttype ];
    card      = trkmem->card[ tmptrunk->dtc ];
-
    sgroup    = tmptrunk->sgroup;
    dtc       = tmptrunk->dtc;
-
    bstate    = tmptrunk->state;
    state     = trkmem->state[ tmptrunk->state ];
    ckt       = tmptrunk->ckt;
 
+   if (bstate == 0) state = "IDL "; // hack
+
    // short clli is first 6 chars of clli
    strncpy(shortClli, tmptrunk->clli, 6);
 
-   cputsxy(13,8, "POST     3   ELQ            BSYQ         DIG                       ");
-   cputsxy(13,10,"TTP 27-0027                                                        ");
-   cputsxy(13,12,"CKT TYPE     PM NO           COM LANG     STA   R   DOT TE  RESULT ");
+   slow_rewrite(13, 8, 67, "POST     3   ELQ            BSYQ         DIG                       ");
+
+   pause();
+   revers(1);
+   cputsxy(13,10,"TTP");
+   revers(0);
+
+   slow_rewrite(16, 10, 64, " 27-0027                                                        ");
+   slow_rewrite(13, 12, 67, "CKT TYPE     PM NO           COM LANG     STA   R   DOT TE  RESULT ");
 // cputsxy(13,14,"2w s7 s7 gwc   8     5  mg36c7ibn2w     1 idl                      ");
+
+   pause();
    gotoxy(13,14);
    cprintf("%2s %-5s %3s  %2u    %2u  %12s    %u %3s",
       direction,
@@ -255,17 +275,21 @@ void ttp_post(char* clli)
       bstate,
       state
    );
-   cputsxy(13,16,"                                                r                  ");
 
-   gotoxy(13,22);
-   //cprintf("%s", clli );
+   slow_rewrite(13,16,67,"                                                r                  ");
+   slow_rewrite(13,28,67,""); 
 
-   gotoxy(13,28); 
+   pause();
+   gotoxy(13,28);
    cprintf("POST G %s", tmptrunk->clli);
-   cputsxy(13,30,"LAST CKTN = 4         ");
+
+   slow_rewrite(13,30,67,"LAST CKTN = 4         ");
+
+   pause();
    gotoxy(13,32);
    cprintf("SHORT CLLI IS: %s", shortClli);
-   cputsxy(13,34,"OK,CKT POSTED         ");
+
+   slow_rewrite(13,34,67,"OK,CKT POSTED         ");
 }
 
 void ttp_list_trunks()
@@ -291,12 +315,35 @@ void ttp_list_trunks()
    }
 }
 
-void ttp_bsy(int trunknum)
+int ttp_bsy()
 {
-   TRKMEM_TRUNK_DATA(trunknum)->state = TRUNK_STATE_MANB;
+   if (postedTrunk)
+   {
+      postedTrunk->state = TRUNK_STATE_MANB;
+      return TRUNK_STATE_MANB;
+   }
+   return TRUNK_ERROR_NO_TRUNK_POSTED;
 }
 
-void ttp_rts(int trunknum)
+int ttp_offl()
 {
-   TRKMEM_TRUNK_DATA(trunknum)->state = TRUNK_STATE_INSV;
+   if (postedTrunk)
+   {
+      postedTrunk->state = TRUNK_STATE_OFFL;
+      return TRUNK_STATE_OFFL;
+   }
+   return TRUNK_ERROR_NO_TRUNK_POSTED;
+}
+
+int ttp_rts()
+{
+   if (postedTrunk)
+   {
+      if (postedTrunk->state == TRUNK_STATE_OFFL)
+         return TRUNK_ERROR_CANNOT_RTS_AN_OFFLINE_TRUNK;
+
+      postedTrunk->state = TRUNK_STATE_INSV;
+      return TRUNK_STATE_INSV;
+   }
+   return TRUNK_ERROR_NO_TRUNK_POSTED;
 }
