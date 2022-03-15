@@ -42,7 +42,7 @@ char* alarmLabel[4] = {
 	".",
 	" Min",
 	" Maj",
-	"C.."
+	"C.. "
 };
 
 char* severity[4] = {

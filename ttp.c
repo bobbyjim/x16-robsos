@@ -135,11 +135,24 @@ char* ttp_menu[] = {
    "Pads",
    "Level"
 };
+void ttp_updateScreen()
+{
+   byte alarmCount = trk_getTrunkAlarmCount();
+   gotoxy(57,2);
+   pause();
+   cprintf("%-2u", alarmCount);
+   pause();
+   cputsxy(59,2, trk_getTrunkAlarmType());
+   revers(1);
+   pause();
+   cputsxy(56,4, trk_getTrunkSeverity());
+   revers(0);
+
+}
 
 void ttp_writeScreen()
 {
    byte i;
-   byte alarmCount = trk_getTrunkAlarmCount();
 
    pause();
    clrscr();
@@ -158,15 +171,7 @@ void ttp_writeScreen()
 // cputsxy(0,0,"   CC     CMC     IOD     Net     PM     CCS     Lns     Trks     Ext    APPL");
    cputsxy(0,0,"                  IOD             PM     CCS     Lns     Trks     Ext    APPL");
 
-   gotoxy(57,2);
-   pause();
-   cprintf("%-2u", alarmCount);
-   pause();
-   cputsxy(59,2, trk_getTrunkAlarmType());
-   revers(1);
-   pause();
-   cputsxy(56,4, trk_getTrunkSeverity());
-   revers(0);
+   ttp_updateScreen();
 }
 
 // void ttp_post_number(int trunknum)
@@ -222,6 +227,8 @@ void ttp_post(char* clli)
    byte  sgroup;
    byte  ckt;
    char  shortClli[7];
+
+   ttp_updateScreen();
 
    tmptrunk = trk_findByClli(clli);
 
@@ -315,6 +322,9 @@ void ttp_list_trunks()
          ttp_readLine("Press <RETURN> to continue");
       }
    }
+   ttp_readLine("Press <RETURN> when done");
+   ttp_clear_center();
+
 }
 
 int ttp_bsy()
