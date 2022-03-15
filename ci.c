@@ -71,6 +71,8 @@ byte quitState[] = {
 char* state_help[] = {
     "\n   DISKUT\n"
     "\n   MAPCI\n"
+    "\n   QUERY MODULE <module name>\n"
+    "\n   QUERY <module name>\n"
     "\n   QUIT\n"
     "\n   QUIT ALL\n"
     "\n   RESTART RELOAD|COLD|WARM\n"
