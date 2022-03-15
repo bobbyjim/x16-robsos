@@ -38,9 +38,11 @@ char* status[8] = {
    ""
 };
 
-char* alarmLabel[4] = {
+char* alarmLabel[6] = {
 	".",
 	" Min",
+   " Min",
+   " Min",
 	" Maj",
 	"C.. "
 };
@@ -107,7 +109,7 @@ void trk_print(Trunk* trunk)
 byte trk_getTrunkAlarmCount()
 {
    byte x;
-   byte alarms[4] = { 0,0,0,0 };
+   byte alarms[8] = { 0,0,0,0,0,0,0,0 };
 
    for(x=0; x<TRKMEM_TRUNK_COUNT; ++x)
    {
@@ -117,15 +119,15 @@ byte trk_getTrunkAlarmCount()
    highAlarmCount = 0;
    highAlarmIndex = 0;
 
-   for(x=0; x<4; ++x)
+   for(x=1; x<5; ++x)
    {
+      //cprintf("index %d: count = %u | high alarm index = %u, count = %u\r\n", x, alarms[x], highAlarmIndex, highAlarmCount);
       if(alarms[x]>0)
       {
          highAlarmCount=alarms[x];
          highAlarmIndex=x;
       }
    }
-   //cprintf(" high alarm = %u, count = %u \r\n", highAlarmIndex, highAlarmCount);
    return highAlarmCount;
 }
 
