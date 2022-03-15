@@ -135,19 +135,25 @@ char* ttp_menu[] = {
    "Pads",
    "Level"
 };
+
 void ttp_updateScreen()
 {
    byte alarmCount = trk_getTrunkAlarmCount();
+
+   cputsxy(57,2,"    ");
    gotoxy(57,2);
    pause();
    cprintf("%-2u", alarmCount);
+
+   cputsxy(59,2,"    ");
    pause();
    cputsxy(59,2, trk_getTrunkAlarmType());
+
+   cputsxy(56,4, "      ");
    revers(1);
    pause();
    cputsxy(56,4, trk_getTrunkSeverity());
    revers(0);
-
 }
 
 void ttp_writeScreen()

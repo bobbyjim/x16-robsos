@@ -9,7 +9,7 @@ srand();
 #
 #
 my @state     = qw/iNsV cbSY mANb sYSb istB offl fbAR hAcf/;
-my @trunks    = qw/dal  ean  imt  onl  ont  mgp  dal  ean/;
+my @trunks    = qw/dal dal ean ean  imt  onl  ont  mgp/;
 my @direction = qw/2w   og   ic   2w/;
 my @line      = qw/dt   dp   /;
 my @select    = qw/ls   gs   go   ls/;
@@ -29,16 +29,22 @@ print $out pack 'A4x', $_ for @card;        # 2 bits,  20 bytes
 #                                                 ---------
 #                                                 128 bytes
 
+my %prefixByTrunkType = ();
+my $prefix = 200;
+
 for my $memvar (0..63) 
 {
      #         CLLI            CKT  SGroup   DTC/I  MEMVAR    State
      # DAL220TWDTGS             1    0        DTC   0  1  1   CBsy
 
-   my $ttyp = int(rand(@trunks));      # 3 bits
+   my $ttyp = int($memvar/8); # rand(@trunks));      # 3 bits
    my $tdir = int(rand(@direction));   # 2 bits 
    my $tlin = int(rand(@line));        # 1 bit 
    my $tsel = int(rand(@select));      # 2 bits 
-   my $prefix = sprintf( "%d%d%d", int(rand(9)+1), int(rand(10)), int(rand(10)));
+   #my $prefix = sprintf( "%d%d%d", int(rand(9)+1), int(rand(10)), int(rand(10)));
+   $prefix += 10 if $prefixByTrunkType{ $ttyp }->{ $prefix };
+
+   $prefixByTrunkType{ $ttyp }->{ $prefix } = 1;
 
    my $shortclli = $trunks[ $ttyp ]
                  . $prefix;
