@@ -28,6 +28,7 @@
 #include "diskut.h"
 #include "restart.h"
 #include "ttp.h"
+#include "module.h"
 
 byte cycle = 1;
 byte state = STATE_CI;
@@ -232,6 +233,11 @@ void ci_run()
     else if ( !strncmp( "restart", ciLowerBuffer, 7) ) 
     {
         restart_run();
+    }
+    else if ((1 == sscanf( ciLowerBuffer, "query module %s", c1))
+           ||(1 == sscanf( ciLowerBuffer, "query %s", c1)))
+    {
+        module_print_random(c1);
     }
     else if (1 == sscanf( ciLowerBuffer, "setlogmsg %s", c1))
     {

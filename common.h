@@ -53,7 +53,7 @@ void setBank(byte bank);
 void hr(byte color);
 void toDefaultColor();
 void common_loadFile(char* name, byte bankNum);
-void common_loadFileAtB800(char* name, byte bankNum);
+void common_loadFileAt(char* name, byte bankNum, unsigned address);
 void down(byte count);
 void left(byte count);
 char pressReturnAndClear();

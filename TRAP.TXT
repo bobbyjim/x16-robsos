@@ -1,0 +1,18 @@
+
+USSPEC     TRAP    JAN09 13:51:54 7600
+        Trap number 42, Bus error. See MAU error register.
+        At 0005001E=SYSPROCS.BJ01:DESC_MOV+#001E,
+        PROCID= #E54D #2009: CALLP, Entry Module: CALLP SSTI: #0EBA
+        Current count of this trap type: 1
+        Traceback:
+           Nil Traceback
+        Fault address             FFFF0010 (Not Found)
+        MAU address hold register 000E0780
+        Access protection mask    000F
+        Peripheral interrupt mask 0055
+        MAU error register        0080
+        MAU ctrl register         009D
+        MAU aux ctrl register     0003
+        Fault Indication Register 0080
+        TRAP out of SYNC on active CPU 0.
+        *** PLEASE CAPTURE FULL TRAPINFO FOR DEBUGGING ***

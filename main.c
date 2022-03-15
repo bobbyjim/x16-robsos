@@ -30,6 +30,8 @@ void main()
 
    common_loadFile("trkmem.bin", 1);
    common_loadFile("volumes.bin", 2);
+   common_loadFileAt("trap.txt", 3, 0xa000);
+   common_loadFileAt("swer.txt", 3, 0xa400);
   
    cbm_k_setnam("pet-case.bin");
    cbm_k_setlfs(0,8,0);

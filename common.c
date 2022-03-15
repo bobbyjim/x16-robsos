@@ -61,12 +61,12 @@ void common_loadFile(char* name, byte bankNum)
    cbm_k_load(LOAD_FLAG, 0xa000);
 }
 
-void common_loadFileAtB800(char* name, byte bankNum)
+void common_loadFileAt(char* name, byte bankNum, unsigned address)
 {
    cbm_k_setnam(name);
    cbm_k_setlfs(IGNORE_LFN,EMULATOR_FILE_SYSTEM,SA_IGNORE_HEADER);
    setBank(bankNum);
-   cbm_k_load(LOAD_FLAG, 0xb800);
+   cbm_k_load(LOAD_FLAG, address);
 }
 
 void down(byte count)

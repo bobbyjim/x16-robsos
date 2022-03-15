@@ -1,4 +1,4 @@
-SOURCES = main.c boot.c ci.c ckt.c common.c diskut.c pause.c restart.c trk.c ttp.c volumes.c 
+SOURCES = main.c boot.c ci.c ckt.c common.c diskut.c module.c pause.c restart.c trk.c ttp.c volumes.c 
 PROGRAM = MAPCI
 
 CC65_TARGET = cx16
