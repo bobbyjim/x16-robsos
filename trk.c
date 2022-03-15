@@ -107,7 +107,7 @@ void trk_print(Trunk* trunk)
 byte trk_getTrunkAlarmCount()
 {
    byte x;
-   byte alarms[4];
+   byte alarms[4] = { 0,0,0,0 };
 
    for(x=0; x<TRKMEM_TRUNK_COUNT; ++x)
    {
